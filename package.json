@@ -8,7 +8,7 @@
   "licenses": [ { "type": "BSD" } ], 
   "version": "0.1",
   "dependencies": {
-    "underscore": "~",
+    "underscore": "0.6.0",
     "json2": "~",
     "jquery": "~"
   }
