@@ -1,0 +1,15 @@
+{ "name": "mimic",
+  "description": "Function monitoring and playback."
+  "site": "http://saunter.org/mimic",
+  "author": "Thomas Rampelberg",
+  "repositories": [ { "type": "git", 
+                      "url": "git://github.com/pyronicide/mimic.git" } 
+                  ], 
+  "licenses": [ { "type": "BSD" } ], 
+  "version": "0.1",
+  "dependencies": {
+    "underscore": "~",
+    "json2": "~",
+    "jquery": "~"
+  }
+}
