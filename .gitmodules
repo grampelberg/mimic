@@ -1,0 +1,9 @@
+[submodule "test/qunit"]
+	path = test/qunit
+	url = git://github.com/jquery/qunit.git
+[submodule "packages/underscore"]
+	path = packages/underscore
+	url = git://github.com/documentcloud/underscore.git
+[submodule "packages/jquery"]
+	path = packages/jquery
+	url = git://github.com/jquery/jquery.git
