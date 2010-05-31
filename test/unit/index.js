@@ -114,6 +114,43 @@ test('mimic().record - argument (object) callbacks', function() {
   same(m.get_history('obj_callback.0.cb'), [], 'No history yet.');
 });
 
+test('mimic().replay - argument callbacks', function() {
+  expect(1);
+  stop();
+
+  var obj = new test_obj();
+  var m = mimic(obj);
+  m.defaults.fetch = function(p) {
+    this.history = { "callback": [ { out: undefined, args: [] } ],
+                     "callback.0": [ { out: "zxcv", args: ["zxcv"] } ] };
+  };
+  m.fetch('none');
+  m.replay();
+  obj.callback(function(v) {
+    equals(v, 'zxcv');
+    start();
+  });
+});
+
+test('mimic().replay - argument (object) callbacks', function() {
+  expect(1);
+  stop();
+
+  var obj = new test_obj();
+  var m = mimic(obj);
+  m.defaults.fetch = function(p) {
+    this.history = { "obj_callback": [ { out: undefined, args: [] } ],
+                     "obj_callback.0.cb": [ { out: "zxcv", args: ["zxcv"] } ] };
+  };
+  m.fetch('none');
+  m.replay();
+  obj.obj_callback({ cb: function(v) {
+    equals(v, 'zxcv');
+    start();
+  }
+                   });
+});
+
 test('mimic().fetch', function() {
   expect(2);
 
