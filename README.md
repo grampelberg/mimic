@@ -16,7 +16,7 @@ To monitor an object's function calls and return values:
     my_obj.fn('a', 'b');
     // [ 'b', 'a' ]'
     m.get_history('fn');
-    // [ { "out": ["b", "a"], "in": ["a", "b"] } ]
+    // [ { "out": ["b", "a"], "args": ["a", "b"] } ]
 
 You can then save this history for later consumption:
 
@@ -30,7 +30,7 @@ session's behavior:
     m.replay();
     my_obj.fn('a', 'b');
     // ["b", "a"]
-    
+
 # node.js
 
 # Browser

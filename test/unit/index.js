@@ -58,14 +58,14 @@ test('mimic().record', function() {
   same(m.functions, ['baz', 'raboof', 'zab.foo', 'zab.raboof'],
        "Ignore private functions, recurse");
   same(obj.baz(), 'baz', 'No changes to return values');
-  same(m.get_history('baz'), [ { resp: 'baz', args: [] } ],
+  same(m.get_history('baz'), [ { out: 'baz', args: [] } ],
        'History is recorded');
   equals(obj.raboof(), 'raboof',
        "'this' context on the object is correctly bound.");
-  same(m.get_history('raboof'), [ { resp: 'raboof', args: [] } ],
+  same(m.get_history('raboof'), [ { out: 'raboof', args: [] } ],
        'More history, just in case.');
   obj.zab.foo();
-  same(m.get_history('zab.foo'), [ { resp: 'zab.foo', args: [] } ],
+  same(m.get_history('zab.foo'), [ { out: 'zab.foo', args: [] } ],
        "Recursion is working");
   same(obj.zab.raboof(), 'foobar', "'this' works for multi-level objects.");
 
@@ -74,7 +74,7 @@ test('mimic().record', function() {
   var m = mimic(obj);
   m.record();
   obj.baz('a', 'b', [], {}, 1);
-  same(m.get_history('baz'), [ { resp: 'baz', args: ['a', 'b', [], {}, 1] } ],
+  same(m.get_history('baz'), [ { out: 'baz', args: ['a', 'b', [], {}, 1] } ],
        "Arguments are getting saved correctly.");
 
   // include private functions, don't recurse
