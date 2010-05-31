@@ -1,24 +1,5 @@
 module('index');
 
-
-var test_obj = function() {
-  var sub_obj = function() {
-    this.foo = function() { return 'zab.foo' };
-    this.bar = 1;
-    this.foobar = 'foobar';
-    this.raboof = function() { return this.foobar };
-    this._baz = function() { return 'zab._baz' };
-    return this;
-  };
-  this.foo = 1;
-  this.foobar = 'raboof';
-  this._bar = function() { return '_bar' };
-  this.baz = function() { return 'baz' };
-  this.raboof = function() { return this.foobar };
-  this.zab = new sub_obj();
-  return this;
-};
-
 test('mimic()', function() {
   expect(9);
 
@@ -48,18 +29,20 @@ test('mimic().get_history', function() {
 });
 
 test('mimic().record', function() {
-  expect();
+  expect(13);
 
   var obj = new test_obj();
   var m = mimic(obj);
 
   // ignore private functions, recurse
   m.record();
-  same(m.functions, ['baz', 'raboof', 'zab.foo', 'zab.raboof'],
+  same(m.functions, normal_functions,
        "Ignore private functions, recurse");
   same(obj.baz(), 'baz', 'No changes to return values');
   same(m.get_history('baz'), [ { out: 'baz', args: [] } ],
        'History is recorded');
+  obj._bar();
+  same(m.get_history('_bar'), [], 'Private functions are ignored.');
   equals(obj.raboof(), 'raboof',
        "'this' context on the object is correctly bound.");
   same(m.get_history('raboof'), [ { out: 'raboof', args: [] } ],
@@ -68,6 +51,7 @@ test('mimic().record', function() {
   same(m.get_history('zab.foo'), [ { out: 'zab.foo', args: [] } ],
        "Recursion is working");
   same(obj.zab.raboof(), 'foobar', "'this' works for multi-level objects.");
+
 
   // record() arguments
   var obj = new test_obj();
@@ -78,5 +62,70 @@ test('mimic().record', function() {
        "Arguments are getting saved correctly.");
 
   // include private functions, don't recurse
+  var obj = new test_obj();
+  var m = mimic(obj, true, true);
+  m.record();
+  same(m.functions, special_functions, 'Incude private, don\'t recurse');
+  equals(obj._bar(), '_bar', 'Private function exists.');
+  same(m.get_history('_bar'), [ { out: '_bar', args: [] } ],
+       "Private functions are recorded.");
+  obj.zab.foo();
+  same(m.get_history('zab.foo'), [], "Recursion didn't occur.");
+});
 
+test('mimic().fetch', function() {
+  expect(2);
+
+  var obj = new test_obj();
+  var m = mimic(obj);
+
+  var hist = { baz: [ { out: "zxcv", args: [] } ],
+               "zab.foo": [ { out: "vbnm", args: [] } ] };
+  m.defaults.fetch = function(p) {
+    this.history = hist;
+  };
+  ok(!m.fetch('data/replay.json'), 'Fetching runs.');
+  same(m.history, hist, 'History has been set.');
+});
+
+test('mimic().save', function() {
+  expect(2);
+
+  var obj = new test_obj();
+  var m = mimic(obj);
+
+  var hist = { baz: [ { out: "zxcv", args: [] } ],
+               "zab.foo": [ { out: "vbnm", args: [] } ] };
+  var saved = {};
+  m.defaults.save = function(p) {
+    saved = this.history;
+  };
+  m.history = hist;
+  ok(!m.save('data/replay.json'), 'Can actually save.');
+  same(saved, hist, 'Correctly saved off.');
+});
+
+test('mimic().replay', function() {
+  expect(8);
+
+  var obj = new test_obj();
+  var m = mimic(obj);
+
+  m.defaults.fetch = function(p) {
+    this.history = { baz: [ { out: "zxcv", args: [] } ],
+                     "zab.foo": [ { out: "vbnm", args: [] } ] };
+  };
+  ok(!m.fetch('data/replay.json'), 'Can acutally fetch stuff.');
+  ok(!m.replay(), 'Replay hooks up right.');
+  same(m.functions, normal_functions, 'Ignore private functions, recurse');
+  same(m.get_history('baz'), [ { "out": "zxcv", args: [] } ],
+       'History has been setup right by fetch.');
+
+  equals(obj.baz(), 'zxcv',
+         'Function has been stubbed and is returning history right.');
+  same(m.get_history('baz'), [],
+       'History is getting decremented on stub call.');
+  equals(obj.zab.foo(), 'vbnm', 'Recursive functions are working.');
+  same(m.get_history('zab.foo'), [],
+       'History is getting decremented at any level.');
 });
