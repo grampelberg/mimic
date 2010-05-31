@@ -73,6 +73,47 @@ test('mimic().record', function() {
   same(m.get_history('zab.foo'), [], "Recursion didn't occur.");
 });
 
+test('mimic().record - argument callbacks', function() {
+  expect(2);
+  stop();
+
+  var obj = new test_obj();
+  var m = mimic(obj);
+  m.record();
+  var verify = function() {
+    same(m.get_history('callback.0'),
+         [ { out: 'callback', args: ['callback'] } ],
+         "Full history of the callback in the root object.");
+    start();
+  };
+
+  obj.callback(function(v) {
+    setTimeout(verify, 1);
+    return v
+  });
+  same(m.get_history('callback.0'), [], 'No history yet.');
+});
+
+test('mimic().record - argument (object) callbacks', function() {
+  expect(2);
+  stop();
+
+  var obj = new test_obj();
+  var m = mimic(obj);
+  m.record();
+  var verify = function() {
+    same(m.get_history('obj_callback.0.cb'),
+         [ { out: 'obj_callback', args: ['obj_callback'] } ],
+         "Full history of the callback in the root object.");
+    start();
+  };
+  obj.obj_callback({ cb: function(v) {
+    setTimeout(verify, 1);
+    return v
+  } });
+  same(m.get_history('obj_callback.0.cb'), [], 'No history yet.');
+});
+
 test('mimic().fetch', function() {
   expect(2);
 
