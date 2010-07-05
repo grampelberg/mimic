@@ -151,6 +151,31 @@ test('mimic().replay - argument (object) callbacks', function() {
                    });
 });
 
+test('mimic().record - jQuery', function() {
+  expect();
+  stop();
+  // var m = mimic(jQuery);
+  // m.record();
+
+  // var verify = function() {
+  //   console.log(m.history);
+  //   start();
+  // };
+
+  // ok(m.functions.indexOf('ajax') != -1, 'Recording base functions.');
+  // ok(m.functions.indexOf('fn.each') != -1,
+  //    'Recording object specific functions.');
+  // try {
+  // $.ajax({
+  //   url: 'test',
+  //   success: function(v, t) {
+  //     setTimeout(verify, 1);
+  //     return t
+  //   }
+  // });
+  // } catch (err) { console.log(err, m.history) }
+});
+
 test('mimic().fetch', function() {
   expect(2);
 
